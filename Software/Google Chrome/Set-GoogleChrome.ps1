@@ -14,7 +14,6 @@
     .\Set-GoogleChrome.ps1 -Uninstall
 #>
 
-
 [CmdletBinding()]
 param (
     [Parameter( Mandatory = $true,
@@ -29,60 +28,15 @@ param (
     $Uninstall,
     [Parameter()]
     [string]
-    $RemoteAgentPath,
+    $DownloadDir = $env:TEMP,
     [Parameter()]
     [string]
-    $PackagesPath,
-    [Parameter()]
-    [string]
-    $PackageInstallTargetDir,
-    [Parameter()]
-    [string]
-    $ChromeInstaller
+    $ChromeInstaller = "GoogleChromeInstaller.exe"
 )
 
-<###
-   |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
-   |    Begin Declare DefaultVars   |
-   |    vvv                   vvv   |
-###>
-
-if (-not ($RemoteAgentPath)) {
-    $RemoteAgentPath = "C:\Windows\LTSvc\"
-};
-
-if (-not ($PackagesPath)) {
-    $PackagesPath = "C:\Windows\LTSvc\packages"
-};
-
-if (-not ($PackageInstallTargetDir)) {
-    $PackageInstallTargetDir = "C:\Windows\LTSvc\packages\chrome"
-};
-
-if (-not ($ChromeInstaller)) {
-    $ChromeInstaller = "GoogleChromeInstaller.exe"
-};
-
-<###
-   |    ^^^                 ^^^     |
-   |    End Declare DefaultVars     |
-   |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
-   |    Begin Declare Functions     |
-   |    vvv                 vvv     |
-###>
-
-function Test-PreReqDirs {
-    if ( -not(Test-Path -Path $RemoteAgentPath) ) {
-        mkdir $RemoteAgentPath;
-    };
-    if ( -not(Test-Path -Path $PackagesPath)) {
-        mkdir $PackagesPath;
-    };
-};
-
 function Install-Chrome {
-    (New-Object System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$PackageInstallTargetDir\$ChromeInstaller")
-    & "$PackageInstallTargetDir\$ChromeInstaller" /silent /install;
+    (New-Object System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$DownloadDir\$ChromeInstaller")
+    & "$DownloadDir\$ChromeInstaller" /silent /install;
 };
 
 function Get-UninstallString {
@@ -97,27 +51,14 @@ function Get-UninstallString {
 function Uninstall-Chrome {
     $UninstallString = ((Get-UninstallString -Program "Google Chrome").UninstallString -replace ('"', "'"))
     powershell.exe -c "& $UninstallString --force-uninstall";
-    Remove-Item -Recurse -Force -Path $PackageInstallTargetDir;
 };
 
-<###
-   |    ^^^                 ^^^     |
-   |    End Declare Functions       |
-   |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
-   |    Begin Execute Functions     |
-   |    vvv                 vvv     |
-###>
-
-if ($Install) {    
-    Test-PreReqDirs;
-
-    if (Test-Path -Path $PackageInstallTargetDir) {
-        Install-Chrome;
+if ($Install) {
+    if (Test-Path -Path $DownloadDir) {
+        Install-Chrome
     } else {
-        mkdir $PackageInstallTargetDir;
-        Install-Chrome;
-    };
-
+        Write-Error "$DownloadDir does no exist."
+    }
 } elseif ($Uninstall) {
     Uninstall-Chrome
 }
