@@ -115,7 +115,7 @@ catch {
 }
 finally {
     # Clean up the SecureString variable from memory
-    if (isset $SecurePassword) {
+    if ($SecurePassword -ne $null) {
         $SecurePassword.Dispose()
         Write-Verbose "SecureString disposed." # Use Write-Host if you want this always visible
     }
