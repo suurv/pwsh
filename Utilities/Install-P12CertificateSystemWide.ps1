@@ -82,7 +82,6 @@ $importParams = @{
     Password          = $SecurePassword
     Exportable        = $false         # Set to $true if you need the key exportable later
     MachineKeySet     = $true          # CRITICAL for LocalMachine store / SYSTEM context
-    Force             = $true          # Overwrite if certificate exists? Use with caution or check first.
 }
 
 # Attempt to import the certificate
