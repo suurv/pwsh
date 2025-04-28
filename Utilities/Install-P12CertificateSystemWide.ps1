@@ -81,7 +81,6 @@ $importParams = @{
     CertStoreLocation = $CertStoreLocation
     Password          = $SecurePassword
     Exportable        = $false         # Set to $true if you need the key exportable later
-    MachineKeySet     = $true          # CRITICAL for LocalMachine store / SYSTEM context
 }
 
 # Attempt to import the certificate
